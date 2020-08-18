@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "poddsok-ai"
+    }
+  },
+  "defaultProject": "poddsok-ai",
+  "cli": {
+    "analytics": "05511c66-aad7-47d1-ab93-0a843521b005"
+  }
 }
