@@ -1,1 +1,10 @@
 <button (click)="record()"> start </button>
+<button (click)="stop()"> stop </button>
+<br/>
+
+<div *ngFor="let string of results">
+	<input type="text" value="{{string}}" />
+</div>	
+
+
+  

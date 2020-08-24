@@ -13,6 +13,7 @@ export class AiComponent implements OnInit {
 	_speech: any;
 	_lastResult: RecognitionResult = null;
 	_isListening: boolean;
+  results: string[] = [];
 
 	public Result: EventEmitter<RecognitionResult> = new EventEmitter<RecognitionResult>();
 
@@ -24,14 +25,12 @@ export class AiComponent implements OnInit {
       this._speech = new SpeechRecognition();
     } else if (window['webkitSpeechRecognition']) {
       this._speech =  new webkitSpeechRecognition();
-      console.log(this._speech);
     } else {
       this._supportRecognition = false;
     }
-    console.log(`Speech supported: ${this._supportRecognition}`);
 
     /* SET PARAMS */
-    this._speech.lang = 'en-US'; 
+    this._speech.lang = 'sv-SE'; 
     this._speech.interimResults = false; // We don't want partial results
     this._speech.maxAlternatives = 1; // By now we are interested only on the most accurate alternative
 
@@ -41,17 +40,26 @@ export class AiComponent implements OnInit {
 
     if (!this._speech.onresult) {
       // VERY IMPORTANT: To preserve the lexical scoping of 'this' across closures in TypeScript, you use Arrow Function Expressions
-      this._speech.onresult = (event) => { this.handleResultEvent(event) };
+      this._speech.onresult = (event) => { 
+        console.log('result now');
+        this.handleResultEvent(event);
+      };
     }
 
     if (!this._speech.onend) {
       // VERY IMPORTANT: To preserve the lexical scoping of 'this' across closures in TypeScript, you use Arrow Function Expressions
-      this._speech.onend = (event) => { this.handleEndEvent(event) };
+
+      this._speech.onend = (event) => { 
+              console.log('onend now');
+              this.stop() };
     }
 
     if (!this._speech.onspeechend) {
       // VERY IMPORTANT: To preserve the lexical scoping of 'this' across closures in TypeScript, you use Arrow Function Expressions
-      this._speech.onspeechend = (event) => { this.handleSpeechEndEvent(event) };
+      this._speech.onspeechend = (event) => { 
+        console.log('onspeechend now')
+        //this.handleSpeechEndEvent(event) 
+      };
     }
 
     if (!this._speech.nomatch) {
@@ -72,20 +80,22 @@ export class AiComponent implements OnInit {
 	    console.log('Handling recognition event.')
 	    const result = event.results[0][0];
 	    this._lastResult = { confidence: result.confidence, transcript: result.transcript };
-
-	    console.log(this._lastResult);
+      console.log('Result handled!');
+      setTimeout(() => this.addResult(), 250);
   }
 
-	private handleEndEvent(event: any): void {
-    console.log('Handling end event.')
-    console.log(event);
-    this._isListening = false;
+  stop(): void {
+    this._speech.stop();
+    this._speech.onresult;
+  }
+
+  addResult(): void {
     if (this._lastResult) {
-      console.log(this._lastResult);
+      this.results.push(this._lastResult.transcript);
     } else {
       this.Result.emit(null);
     }
-    this._lastResult = null;
+    this._lastResult = null; 
   }
 
   handleSpeechStart(event: any): void {
@@ -93,7 +103,7 @@ export class AiComponent implements OnInit {
     console.log('Listening...');
   }
 
-    private handleSpeechEndEvent(event: any): void {
+  private handleSpeechEndEvent(event: any): void {
     console.log('Handling speech end event.')
     console.log(event);
     this._isListening = false;
