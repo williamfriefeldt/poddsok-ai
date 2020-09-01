@@ -8,14 +8,27 @@
   <body>
     <h2> Plyssningen v0.1 </h2>
     <form method="post" action="{{ url_for('handle_podcast')}}">
-      <label> Podcast: </label>
-      <input id="podcast" type="text" name="podcast" placeholder="Titel" autocomplete="off">
-      <button type="submit"> Sök </button>
+      <select onchange="this.form.submit()" name="pod">
+        {% for item in data.podcasts %}
+          <option> {{ item.title }} </option>
+        {% endfor %}
+      </select>
     </form>
 
-    {% if podcast != None %}
-      {{ podcast }}
+    {% if data.episodes != None %}
+      <form method="post" action="{{ url_for('handle_episode')}}">
+        <select onchange="this.form.submit()" name="episode">
+            {% for episode in data.episodes %}
+                <option> {{ data.episodes[episode]['name'] }} </option>
+            {% endfor %}
+        </select>
+      </form>
     {% endif %}
 
+    {% if data.episode %}
+      <form action="{{ url_for('to_recording')}}" method="post">
+        <button name="forwardBtn" type="submit"> Fortsätt till inspelning </button>
+      </form>
+    {% endif %}
   </body>
 </html>
