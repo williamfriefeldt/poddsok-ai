@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Plyssningen</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <h2> Plyssningen v0.1 </h2>
+    <form method="post" action="{{ url_for('handle_podcast')}}">
+      <label> Podcast: </label>
+      <input id="podcast" type="text" name="podcast" placeholder="Titel" autocomplete="off">
+      <button type="submit"> Sök </button>
+    </form>
+
+    {% if podcast != None %}
+      {{ podcast }}
+    {% endif %}
+
+  </body>
+</html>

@@ -1,0 +1,14 @@
+body {
+	background-color: lightgrey;
+	font-family: Verdana;
+}
+
+input {
+	background-color: lightgrey;
+    border: none;
+    border-bottom: 2px solid;
+}
+
+input:focus, textarea:focus, select:focus{
+    outline: none;
+}
