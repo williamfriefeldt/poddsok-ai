@@ -1,7 +1,11 @@
+# Imports:
+# - Flask: Framework to use Python in browser
+# - Pyrebase: Lib to call Firebase (database) in Python
+# - Collections: OrderedDict, data type from FB
+
 from flask import Flask, render_template, request, send_file, jsonify
 import pyrebase
 from collections import OrderedDict
-import os
 import keyboard as key
 from flask_moment import Moment
 from plysslingen import Plyssningen
