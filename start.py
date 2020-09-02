@@ -9,6 +9,7 @@ from collections import OrderedDict
 import keyboard as key
 from flask_moment import Moment
 from plysslingen import Plyssningen
+import threading
 
 config = {
     "apiKey": "AIzaSyC3Jx94GLlQlmMd36cFYonw2MrfTXf4YPE",
@@ -23,6 +24,7 @@ config = {
 
 app = Flask(__name__)
 moment = Moment(app)
+recordInstance = Plyssningen()
 
 podcasts = []
 
@@ -78,7 +80,7 @@ def to_recording():
     episode = request.args.get('episode').replace(' ','_')
     podcast = request.args.get('podcast').replace(' ','_')
     time = getTime()
-    recordInstance = Plyssningen( podcast, episode, time )
+    recordInstance.setAttr( podcast, episode, time )
     recordInstance.writeInfo()
     return render_template('recording.html', data = { 'podcast':podcast, 'episode':episode })
 
@@ -103,6 +105,16 @@ def getTime():
 
 @app.route('/time')
 def time():
+    if not recordInstance.checkListening():
+        recordStatus = 'Recording...'
+        recordMic = threading.Thread(target= recordInstance.startMicrophone, args=() )
+        recordMic.start()
+    else:
+        recordStatus = recordInstance.getAudioRes()
     time = getTime()
     timeString = str(time[0])+str(time[1])+':'+str(time[2])+str(time[3])
-    return jsonify(timeString)
+    recordInstance.setTime(timeString)
+    return jsonify( { 'time': timeString, 'recordStatus': recordStatus } )
+
+      
+

@@ -18,6 +18,7 @@
     		<a href="{{ url_for('download', filename=data.podcast+' - '+data.episode) }}" target="_blank"><button>Ladda ner textfil</button></a>
     	</div>
 		</div>
+    <span id="record-status"></span> 
    	<button id="record-btn">Spela in</button>
   </body>
 
@@ -28,17 +29,18 @@
   		var btn = $('#record-btn');
   		if( btn.html() === 'Spela in' ) { 
   			timeInterval = setInterval( timer, 1000 );
-  			btn.html('Paus')
+  			btn.html('Paus');
   		} else { 
   			clearInterval( timeInterval );
-  			btn.html('Spela in')
+  			btn.html('Spela in');
   		}
 	  	timer()
 	  });
 
 	  var timer = () => {
   		$.getJSON('/time', data => {
-  			$('#time').html( data );
+  			$('#time').html( data.time );
+        $('#record-status').html( data.recordStatus );
   		});
 	  }
   	

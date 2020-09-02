@@ -47,3 +47,7 @@ button:hover {
 h3 {
 	height: 10px;
 }
+#record-status {
+	display: block;
+	margin-left: 1%;
+}
