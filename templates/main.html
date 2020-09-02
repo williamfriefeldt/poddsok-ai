@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="shortcut icon" type="image/x-icon" href="static/images/title-icon.png" />
     <title>Plyssningen</title>
-
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
@@ -26,8 +26,9 @@
     {% endif %}
 
     {% if data.episode %}
-      <form action="{{ url_for('to_recording')}}" method="post">
-        <button name="forwardBtn" type="submit"> Fortsätt till inspelning </button>
+      <form action="{{ url_for('to_recording', episode = data.episode, podcast = data.podcast) }}" method="post">
+        <span name="episode" value="{{ data.episode }}">
+        <button name="forwardBtn" type="submit"> Fortsätt tid inspelning </button>
       </form>
     {% endif %}
   </body>

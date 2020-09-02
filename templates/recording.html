@@ -1,12 +1,46 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="shortcut icon" type="image/x-icon" href="static/images/title-icon.png" />
     <title>Plyssningen</title>
-
+    {{ moment.include_jquery() }}
+    {{ moment.include_moment() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <h2> Plyssningen v0.1 </h2>
-    <a class="label label-primary" href="/download.txt" target="_blank" style="margin-right: 5px;">Download pdf </a>
+  	<div class="flex">
+    	<h2> Plyssningen v0.1 </h2>
+    	<div>
+    		{{ moment().format('MMMM Do YYYY, h:mm:ss a') }}
+    		<h3> Podcast: {{ data.podcast.replace("_"," ") }} </h3>
+    		<h3> Avsnitt: {{ data.episode.replace("_"," ") }} </h3>
+    		<h3> Tid: <span id="time"> 00:00 </span></h3>
+    		<a href="{{ url_for('download', filename=data.podcast+' - '+data.episode) }}" target="_blank"><button>Ladda ner textfil</button></a>
+    	</div>
+		</div>
+   	<button id="record-btn">Spela in</button>
   </body>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>
+  	var timeInterval;
+  	$('#record-btn').click( () => {
+  		var btn = $('#record-btn');
+  		if( btn.html() === 'Spela in' ) { 
+  			timeInterval = setInterval( timer, 1000 );
+  			btn.html('Paus')
+  		} else { 
+  			clearInterval( timeInterval );
+  			btn.html('Spela in')
+  		}
+	  	timer()
+	  });
+
+	  var timer = () => {
+  		$.getJSON('/time', data => {
+  			$('#time').html( data );
+  		});
+	  }
+  	
+  </script>
 </html>
