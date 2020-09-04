@@ -1,7 +1,13 @@
-# Imports:
-# - Flask: Framework to use Python in browser
-# - Pyrebase: Lib to call Firebase (database) in Python
-# - Collections: OrderedDict, data type from FB
+''' 
+Imports:
+- Flask: Framework to use Python in browser
+- Pyrebase: Lib to call Firebase (database) in Python
+- Collections: OrderedDict, data type from FB
+- Keyboard: Python access computer keyboard
+- FlaskMoment: Display date and time
+- Plyssningen: Speech recognition class, see plyssningen.py
+- Threading: To start Plyssningen while giving status to html
+'''
 
 from flask import Flask, render_template, request, send_file, jsonify
 import pyrebase
@@ -11,6 +17,7 @@ from flask_moment import Moment
 from plysslingen import Plyssningen
 import threading
 
+#Setup for Firebase
 config = {
     "apiKey": "AIzaSyC3Jx94GLlQlmMd36cFYonw2MrfTXf4YPE",
     "authDomain": "poddsok.firebaseapp.com",
@@ -22,12 +29,13 @@ config = {
     "measurementId": "G-L7RKMPYTB6"
 }
 
+#Initialize app and Plysslingen
 app = Flask(__name__)
 moment = Moment(app)
 recordInstance = Plyssningen()
 
+#Get podcasts form FB
 podcasts = []
-
 def getPodcasts():
     if len(podcasts) == 0:
         firebase = pyrebase.initialize_app(config)
@@ -38,12 +46,14 @@ def getPodcasts():
             podcasts.append( { 'title': key, 'episodes':values[key] } )
     return podcasts  
 
+#Redirect user to main view and fetch podcasts
 @app.route('/')
 def index():
     podcasts = getPodcasts()
     episodes = None
     return render_template('main.html', data = { 'podcasts': podcasts, 'episodes': None})
 
+#When podcasts choosen => display episodes
 @app.route('/handle_podcast', methods=['POST'])
 def handle_podcast():
     podcasts = getPodcasts()
@@ -59,6 +69,7 @@ def handle_podcast():
     episodes = podcast['episodes']
     return render_template('main.html', data = { 'podcasts': podcasts, 'episodes': episodes})
 
+#When episodes choosen => display button for next view
 @app.route('/handle_episode', methods=['POST'])
 def handle_episode():
     podcasts = getPodcasts()
@@ -75,21 +86,23 @@ def handle_episode():
             break
     return render_template('main.html', data = { 'podcasts': podcasts, 'podcast': podcasts[0]['title'], 'episodes': episodes, 'episode': episode })
 
+#Redirect user to recording view and set file info for Plyssningen
 @app.route('/to_recording', methods=['POST'])
 def to_recording():
     episode = request.args.get('episode').replace(' ','_')
     podcast = request.args.get('podcast').replace(' ','_')
-    time = getTime()
-    recordInstance.setAttr( podcast, episode, time )
+    recordInstance.setAttr( podcast, episode )
     recordInstance.writeInfo()
     return render_template('recording.html', data = { 'podcast':podcast, 'episode':episode })
 
+#Save file to computer
 @app.route('/download/<path:filename>.txt')
 def download(filename):
     return send_file('test_res.txt', attachment_filename='')
 
-timeCount=[0,0,0,0]
-def getTime():
+#Update current recording time
+def getTime(): 
+    timeCount = recordInstance.time
     if timeCount[3] == 9:
         timeCount[2] += 1
         timeCount[3] = 0
@@ -101,8 +114,10 @@ def getTime():
     if timeCount[1] == 6:
         timeCount[0] += 1
         timeCount[1] = 0
+    recordInstance.time = timeCount
     return timeCount
 
+#Handle recording state / update html on recording status
 @app.route('/time')
 def time():
     if not recordInstance.checkListening():
@@ -113,7 +128,7 @@ def time():
         recordStatus = recordInstance.getAudioRes()
     time = getTime()
     timeString = str(time[0])+str(time[1])+':'+str(time[2])+str(time[3])
-    recordInstance.setTime(timeString)
+    recordInstance.setTime()
     return jsonify( { 'time': timeString, 'recordStatus': recordStatus } )
 
       

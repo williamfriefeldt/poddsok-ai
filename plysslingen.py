@@ -6,26 +6,23 @@ class Plyssningen:
     def __init__(self):
         self.podcast = ''
         self.episode = ''
-        self.time = ''
+        self.time = [0,0,0,0]
         self.file = ''
         self.audioRes = ''
         self.isListening = False
 
-    def __str__(self):
-        return self.podcast + ' ' + self.episode + ' ' + str(self.time[0])+str(self.time[1])+':'+str(self.time[2])+str(self.time[3])
-
-    def setAttr(self, podcast, episode, time):
+    def setAttr(self, podcast, episode):
         self.podcast = podcast
         self.episode = episode
-        self.time = time
-        self.file = open( "test_res.txt", "w" )
+        self.time = [0,0,0,0]
 
     def writeInfo(self):
+        self.file = open( "test_res.txt", "w" )
         self.file.write( "Podcast: " + self.podcast + "\n" + "Episode: " + self.episode + "\n=======================\n")
 
-    def setTime(self, time):
-        self.time = time
+    def setTime(self):
         self.file = open( "test_res.txt", "a+" )
+        time = str(self.time[0])+str(self.time[1])+':'+str(self.time[2])+str(self.time[3])
         self.file.write(time + "\n")
 
     def getAudioRes(self):
@@ -35,11 +32,12 @@ class Plyssningen:
         return self.isListening
 
     def startMicrophone(self):
+        print('lol')
+        key.press('enter')
         self.isListening = True
         key.press_and_release('play/pause media')
         r = sr.Recognizer()
         mic = sr.Microphone()
-        print('hej')
         try:
             with mic as source:
                 r.adjust_for_ambient_noise(source)
