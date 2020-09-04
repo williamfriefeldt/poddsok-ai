@@ -27,22 +27,43 @@
   	var timeInterval;
   	$('#record-btn').click( () => {
   		var btn = $('#record-btn');
+      var recStatus = false;
   		if( btn.html() === 'Spela in' ) { 
-  			timeInterval = setInterval( timer, 1000 );
+        timer()
   			btn.html('Paus');
   		} else { 
-  			clearInterval( timeInterval );
   			btn.html('Spela in');
   		}
-	  	timer()
 	  });
 
 	  var timer = () => {
   		$.getJSON('/time', data => {
   			$('#time').html( data.time );
         $('#record-status').html( data.recordStatus );
-  		});
-	  }
+        checkResult(); 
+      });
+	  };
+
+    var checkResult = () => {
+      $.getJSON('/checkResult', data => {
+        console.log(data)
+        $('#time').html( data.time );
+        if(data.recordRes !== '') {
+          $('#record-status').html( data.recordRes );
+          $('#record-btn').html( 'Spela in' );
+          saveResult();
+        }else{
+          setTimeout( () => { checkResult() }, 1000)
+        }
+      });
+    };
+
+    var saveResult = () => {
+      $.getJSON('/saveResult', data => {
+        console.log('Result saved!');
+        console.log(data)
+      })
+    }
   	
   </script>
 </html>

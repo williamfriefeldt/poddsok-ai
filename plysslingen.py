@@ -19,11 +19,14 @@ class Plyssningen:
     def writeInfo(self):
         self.file = open( "test_res.txt", "w" )
         self.file.write( "Podcast: " + self.podcast + "\n" + "Episode: " + self.episode + "\n=======================\n")
+        self.file.close()
 
     def setTime(self):
         self.file = open( "test_res.txt", "a+" )
         time = str(self.time[0])+str(self.time[1])+':'+str(self.time[2])+str(self.time[3])
-        self.file.write(time + "\n")
+        print(time + '- "' + self.audioRes + '"\n')
+        self.file.write(time + '- "' + self.audioRes + '"\n')
+        self.file.close()
 
     def getAudioRes(self):
         return self.audioRes
@@ -32,9 +35,8 @@ class Plyssningen:
         return self.isListening
 
     def startMicrophone(self):
-        print('lol')
-        key.press('enter')
         self.isListening = True
+        self.audioRes = ''
         key.press_and_release('play/pause media')
         r = sr.Recognizer()
         mic = sr.Microphone()
@@ -47,15 +49,16 @@ class Plyssningen:
             print( "There was an error in the recording:")
             print(e)
             print(mic)
-            start()
 
     def result(self, audio, r):
         key.press_and_release('play/pause media')
         try:
             self.audioRes = r.recognize_google(audio, language='sv-SE')
+            self.isListening = False
         except:
             self.audioRes = 'Could not find sound :/'
-        self.isListening = False
+            self.isListening = False
+        
 
 
 

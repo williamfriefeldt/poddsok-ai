@@ -120,16 +120,23 @@ def getTime():
 #Handle recording state / update html on recording status
 @app.route('/time')
 def time():
-    if not recordInstance.checkListening():
-        recordStatus = 'Recording...'
-        recordMic = threading.Thread(target= recordInstance.startMicrophone, args=() )
-        recordMic.start()
-    else:
-        recordStatus = recordInstance.getAudioRes()
+    recordStatus = 'Recording...'
+    recordMic = threading.Thread( target= recordInstance.startMicrophone, args=() )
+    recordMic.start()
     time = getTime()
     timeString = str(time[0])+str(time[1])+':'+str(time[2])+str(time[3])
-    recordInstance.setTime()
     return jsonify( { 'time': timeString, 'recordStatus': recordStatus } )
+
+@app.route('/checkResult')
+def checkResult():
+    time = getTime()
+    timeString = str(time[0])+str(time[1])+':'+str(time[2])+str(time[3])
+    return jsonify( { 'time': timeString, 'recordRes': recordInstance.audioRes })
+
+@app.route('/saveResult')
+def saveResult():
+    recordInstance.setTime()
+    return jsonify( recordInstance.audioRes )
 
       
 
