@@ -3,16 +3,13 @@ Imports:
 - Flask: Framework to use Python in browser
 - Pyrebase: Lib to call Firebase (database) in Python
 - Collections: OrderedDict, data type from FB
-- Keyboard: Python access computer keyboard
 - FlaskMoment: Display date and time
 - Plyssningen: Speech recognition class, see plyssningen.py
 - Threading: To start Plyssningen while giving status to html
 '''
-
 from flask import Flask, render_template, request, send_file, jsonify
 import pyrebase
 from collections import OrderedDict
-import keyboard as key
 from flask_moment import Moment
 from plysslingen import Plyssningen
 import threading
@@ -87,8 +84,10 @@ def handle_episode():
     return render_template('main.html', data = { 'podcasts': podcasts, 'podcast': podcasts[0]['title'], 'episodes': episodes, 'episode': episode })
 
 #Redirect user to recording view and set file info for Plyssningen
+resultList = []
 @app.route('/to_recording', methods=['POST'])
 def to_recording():
+    resultList = []
     episode = request.args.get('episode').replace(' ','_')
     podcast = request.args.get('podcast').replace(' ','_')
     recordInstance.setAttr( podcast, episode )
@@ -118,25 +117,28 @@ def getTime():
     return timeCount
 
 #Handle recording state / update html on recording status
-@app.route('/time')
+@app.route( '/time' )
 def time():
-    recordStatus = 'Recording...'
+    recordStatus = 'Spelar in...'
     recordMic = threading.Thread( target= recordInstance.startMicrophone, args=() )
     recordMic.start()
-    time = getTime()
-    timeString = str(time[0])+str(time[1])+':'+str(time[2])+str(time[3])
-    return jsonify( { 'time': timeString, 'recordStatus': recordStatus } )
+    return jsonify( { 'recordStatus': recordStatus } )
 
-@app.route('/checkResult')
+@app.route( '/checkResult' )
 def checkResult():
-    time = getTime()
-    timeString = str(time[0])+str(time[1])+':'+str(time[2])+str(time[3])
-    return jsonify( { 'time': timeString, 'recordRes': recordInstance.audioRes })
+    if recordInstance.audioRes == 'Analyserar ljud...':
+        time = recordInstance.time
+    else:
+        time = getTime()
+    timeString = str( time[0] ) + str( time[1] ) + ':' + str( time[2] ) + str( time[3] )
+    return jsonify( { 'time': timeString, 'recordRes': recordInstance.audioRes, 'isListening': recordInstance.isListening })
 
-@app.route('/saveResult')
+@app.route( '/saveResult' )
 def saveResult():
     recordInstance.setTime()
-    return jsonify( recordInstance.audioRes )
+    timeString = str(recordInstance.time[0])+str(recordInstance.time[1])+':'+str(recordInstance.time[2])+str(recordInstance.time[3])
+    resultList.append( '[ ' + timeString + ', "' + recordInstance.audioRes + '"' )
+    return jsonify( resultList )
 
       
 

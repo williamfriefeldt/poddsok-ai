@@ -1,19 +1,18 @@
 body {
-	background-color: #ab0000;
-	color: white;
+	background-color: white;
+	color: purple;
 	font-family: Verdana;
 }
 button {
 	background-color: white;
 	border-radius: 20px;
-	color: #ab0000;
+	color: purple;
 	cursor: pointer;
 	margin: 1%;
 	font-size: 15px;
 	height: 25px;
 	width: 250px;
-	border: 1px brown solid;
-	transition: visibility 0s, opacity 0.5s linear;
+	border: 1px purple solid;
 }
 
 input:focus, textarea:focus, select:focus{
@@ -23,12 +22,12 @@ select:hover {
 	cursor: pointer
 }
 select {
-	background-color: #ab0000;
+	background-color: white;
 	border: none;
 	border-bottom: 2px solid white;
 	width: 40%;
 	cursor: pointer;
-	color: white;
+	color: purple;
 }
 
 button:focus {
@@ -44,10 +43,20 @@ button:hover {
 	justify-content: space-between;
 	display: flex;
 }
-h3 {
-	height: 10px;
+.col-left {
+	width: 70%;
+}
+.col-right {
+	width: 30%;
 }
 #record-status {
 	display: block;
 	margin-left: 1%;
+}
+#allResults {
+	height: 80vh;
+	overflow-y: scroll;
+}
+#allResults::-webkit-scrollbar {
+  display: none;
 }

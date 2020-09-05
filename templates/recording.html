@@ -9,8 +9,13 @@
   </head>
   <body>
   	<div class="flex">
-    	<h2> Plyssningen v0.1 </h2>
-    	<div>
+      <div class="col-left">
+        <h2> Plyssningen v0.1 </h2>
+        <span id="record-status"></span> 
+        <button id="record-btn">Spela in</button>
+        <div id="allResults"> </div>
+      </div>
+    	<div class="col-right">
     		{{ moment().format('MMMM Do YYYY, h:mm:ss a') }}
     		<h3> Podcast: {{ data.podcast.replace("_"," ") }} </h3>
     		<h3> Avsnitt: {{ data.episode.replace("_"," ") }} </h3>
@@ -18,50 +23,50 @@
     		<a href="{{ url_for('download', filename=data.podcast+' - '+data.episode) }}" target="_blank"><button>Ladda ner textfil</button></a>
     	</div>
 		</div>
-    <span id="record-status"></span> 
-   	<button id="record-btn">Spela in</button>
   </body>
 
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>
-  	var timeInterval;
-  	$('#record-btn').click( () => {
-  		var btn = $('#record-btn');
-      var recStatus = false;
-  		if( btn.html() === 'Spela in' ) { 
+  	$( '#record-btn' ).click( () => {
+  		var btn = $( '#record-btn' );
+  		if( btn.css('visibility') === 'visible' ) { 
         timer()
-  			btn.html('Paus');
-  		} else { 
-  			btn.html('Spela in');
+  			btn.css('visibility', 'hidden');
   		}
 	  });
 
 	  var timer = () => {
-  		$.getJSON('/time', data => {
-  			$('#time').html( data.time );
-        $('#record-status').html( data.recordStatus );
+  		$.getJSON( '/time', data => {
+        $( '#record-status' ).html( data.recordStatus );
         checkResult(); 
       });
 	  };
 
     var checkResult = () => {
-      $.getJSON('/checkResult', data => {
-        console.log(data)
-        $('#time').html( data.time );
-        if(data.recordRes !== '') {
-          $('#record-status').html( data.recordRes );
-          $('#record-btn').html( 'Spela in' );
+      $.getJSON( '/checkResult', data => {
+        $( '#time' ).html( data.time );
+        if(!data.isListening) {
+          $( '#record-status' ).html( 'Resultat: "' + data.recordRes +'"' );
+          $( '#record-btn' ).css('visibility', 'visible');
           saveResult();
-        }else{
-          setTimeout( () => { checkResult() }, 1000)
+        } else if(data.recordRes === 'Analyserar ljud...') {
+          $('#record-status').html( data.recordRes );
+          setTimeout( () => { checkResult() }, 1000 )
+        } else {
+          setTimeout( () => { checkResult() }, 1000 )
         }
       });
     };
 
     var saveResult = () => {
-      $.getJSON('/saveResult', data => {
-        console.log('Result saved!');
-        console.log(data)
+      $.getJSON( '/saveResult', data => {
+        var html = ''
+        for( var i in data ){
+          html += '<div class="flex"><div class="col-left">' + data[i] + '</div><div class="col-right">]</div></div>'
+        }
+        var div = $( '#allResults' );
+        div.html( html );
+        $( '#allResults' ).scrollTop( $( '#allResults' )[0].scrollHeight);
+
       })
     }
   	
