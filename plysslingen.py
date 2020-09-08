@@ -8,7 +8,6 @@ import keyboard as key
 
 #Class to start sound, record audio from microphone, analyze audio and return result to start.py.
 class Plyssningen:
-
     '''
     Attributes:
      - Chosen podcast and episode
@@ -54,7 +53,11 @@ class Plyssningen:
     def startMicrophone( self ):
         self.isListening = True
         self.audioRes = ''
-        key.press_and_release( 'play/pause media' )
+        try:
+            key.press_and_release( 'play/pause media' )
+        except ValueError:
+            self.audioRes = 'Tillåtelse till tangentbord nekat, vänligen tillåt detta.'
+            self.isListening = False
         r = sr.Recognizer()
         mic = sr.Microphone()
         try:

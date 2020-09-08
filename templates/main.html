@@ -2,24 +2,29 @@
 <html>
   <head>
     <link rel="shortcut icon" type="image/x-icon" href="static/images/title-icon.png" />
-    <title>Plyssningen</title>
+    <title>Plyssningen v0.1</title>
+    {{ moment.include_jquery() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <h2> Plyssningen v0.1 </h2>
-    <form method="post" action="{{ url_for('handle_podcast')}}">
-      <select onchange="this.form.submit()" name="pod">
-        {% for item in data.podcasts %}
-          <option> {{ item.title }} </option>
-        {% endfor %}
-      </select>
-    </form>
+    <h1> Plyssningen v0.1 </h1>
+
+    <div class="intro-div">
+      <p> {{data.infoText}} </p>
+      <form method="post" action="{{ url_for('handle_podcast')}}">
+        <select onchange="this.form.submit()" name="pod">
+          {% for item in data.podcasts %}
+            <option> {{ item.title }} </option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
 
     {% if data.episodes != None %}
-      <form method="post" action="{{ url_for('handle_episode')}}">
+      <form class="episodes" method="post" action="{{ url_for('handle_episode')}}">
         <select onchange="this.form.submit()" name="episode">
             {% for episode in data.episodes %}
-                <option> {{ data.episodes[episode]['name'] }} </option>
+              <option> {{ data.episodes[episode].nr }} . {{ data.episodes[episode].name }} </option>
             {% endfor %}
         </select>
       </form>
@@ -28,8 +33,18 @@
     {% if data.episode %}
       <form action="{{ url_for('to_recording', episode = data.episode, podcast = data.podcast) }}" method="post">
         <span name="episode" value="{{ data.episode }}">
-        <button name="forwardBtn" type="submit"> Fortsätt tid inspelning </button>
+        <button class="continue-button" name="forwardBtn" type="submit"> Till inspelning </button>
       </form>
     {% endif %}
   </body>
+
+  <script>
+    if( $(".episodes").html() === undefined ) {
+      $( 'h1' ).animate({ opacity: 1 }, 2000 );
+      $( '.intro-div' ).animate({ opacity: 1 }, 2000 );
+    } else {
+      $( 'h1' ).css({ opacity: 1 });
+      $( '.intro-div' ).css({ opacity: 1 });      
+    }
+  </script>
 </html>

@@ -1,20 +1,28 @@
 body {
 	background-color: white;
-	color: purple;
-	font-family: Verdana;
+	color: #320E44;
+	font-family: courier, monospace;
 }
 button {
 	background-color: white;
 	border-radius: 20px;
-	color: purple;
+	color: #320E44;
 	cursor: pointer;
 	margin: 1%;
 	font-size: 15px;
-	height: 25px;
-	width: 250px;
-	border: 1px purple solid;
+	height: 30px;
+	width: 225px;
+	border: 1px #320E44 solid;
+	font-family: courier, monospace;
 }
-
+button:focus {
+	outline: none;
+}
+button:hover {
+	font-size: 17.5px;
+	height: 32.5px;
+	width: 240px;
+}
 input:focus, textarea:focus, select:focus{
     outline: none; 	
 }
@@ -24,20 +32,19 @@ select:hover {
 select {
 	background-color: white;
 	border: none;
-	border-bottom: 2px solid white;
-	width: 40%;
+	border-bottom: 2px solid #320E44; 
+	width: 400px;
 	cursor: pointer;
-	color: purple;
+	color: #320E44;
+	font-size: 22px;
 }
-
-button:focus {
-	outline: none;
+h1 {
+	margin-left: 1.25%;
+	opacity: 0;
 }
-
-button:hover {
-	font-size: 17.5px;
-	height: 27.5px;
-	width: 275px;
+form, p {
+	text-align: center;
+	margin-top: 1.5%;
 }
 .flex {
 	justify-content: space-between;
@@ -48,6 +55,9 @@ button:hover {
 }
 .col-right {
 	width: 30%;
+}
+.intro-div {
+	opacity: 0;
 }
 #record-status {
 	display: block;

@@ -8,9 +8,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
+    <h1> Plyssningen v0.1 </h1>
+
   	<div class="flex">
       <div class="col-left">
-        <h2> Plyssningen v0.1 </h2>
         <span id="record-status"></span> 
         <button id="record-btn">Spela in</button>
         <div id="allResults"> </div>
@@ -26,6 +27,8 @@
   </body>
 
   <script>
+    $('h1').css( { opacity:1 });
+
   	$( '#record-btn' ).click( () => {
   		var btn = $( '#record-btn' );
   		if( btn.css('visibility') === 'visible' ) { 
@@ -45,10 +48,14 @@
       $.getJSON( '/checkResult', data => {
         $( '#time' ).html( data.time );
         if(!data.isListening) {
-          $( '#record-status' ).html( 'Resultat: "' + data.recordRes +'"' );
+          if( data.recordRes === "Tillåtelse till tangentbord nekat, vänligen tillåt detta." ) {
+            $( '#record-status' ).html( data.recordRes );
+          } else {
+            $( '#record-status' ).html( 'Resultat: "' + data.recordRes +'"' );
+            saveResult();
+          }
           $( '#record-btn' ).css('visibility', 'visible');
-          saveResult();
-        } else if(data.recordRes === 'Analyserar ljud...') {
+        } else if( data.recordRes === 'Analyserar ljud...' ) {
           $('#record-status').html( data.recordRes );
           setTimeout( () => { checkResult() }, 1000 )
         } else {
@@ -65,8 +72,7 @@
         }
         var div = $( '#allResults' );
         div.html( html );
-        $( '#allResults' ).scrollTop( $( '#allResults' )[0].scrollHeight);
-
+        div.scrollTop( $( '#allResults' )[0].scrollHeight);
       })
     }
   	
