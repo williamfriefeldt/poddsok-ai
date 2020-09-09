@@ -27,8 +27,8 @@ config = {
 }
 
 #Initialize app and Plysslingen
-app = Flask(__name__)
-moment = Moment(app)
+app = Flask( __name__ )
+moment = Moment( app )
 recordInstance = Plyssningen()
 
 #Get podcasts form FB
@@ -49,6 +49,7 @@ def getPodcasts():
 @app.route('/')
 def index():
     podcasts = getPodcasts()
+    podcasts.sort( key = lambda x: x['title'])
     episodes = None
     return render_template('main.html', data = { 
         'podcasts': podcasts, 
@@ -57,19 +58,20 @@ def index():
     })
 
 #When podcasts choosen => display episodes
-@app.route( '/handle_podcast', methods = [ 'POST' ] )
+@app.route( '/handle_podcast', methods = ['POST'] )
 def handle_podcast():
     podcasts = getPodcasts()
-    podcasts.sort( key = lambda x: x['title'])
     pod = request.form['pod']
     i = 0
-    while i < len(podcasts):
+    while i < len( podcasts ):
         if pod == podcasts[i]['title']:
             podcast = podcasts[i]
             del podcasts[i]
             podcasts.insert( 0, podcast )
         i += 1
-    episodes = podcast['episodes']
+    episodes = list( podcast['episodes'].items() )
+    episodes.sort( key = lambda x: x[1]['nr'] )
+    episodes = dict( episodes )
     return render_template( 'main.html', data = { 
         'podcasts': podcasts, 
         'episodes': episodes, 
@@ -84,13 +86,15 @@ def handle_episode():
     episode = request.form['episode']
     i = 0
     episode = episode.split('.')[1]
-    for ep in episodes:
-        if episodes[ep]['name'] == episode:
-            chosenEp = episodes[ep]
-            firstEp = episodes[0]
-            del episodes[ep]
-            episodes[0] = chosenEp
-            episodes[ep] = firstEp
+    listEpisodes = list( episodes.items() )
+    for ep in listEpisodes:
+        if ep[1]['name'] == episode:
+            listEpisodes.remove(ep)
+            listEpisodes.sort( key = lambda x: x[1]['nr'] )
+            listEpisodes.insert(0, ep)
+            break
+
+    episodes = dict(listEpisodes)
     return render_template( 'main.html', data = { 
         'podcasts': podcasts, 
         'podcast': podcasts[0]['title'], 
@@ -131,7 +135,7 @@ def getTime():
     recordInstance.time = timeCount
     return timeCount
 
-#Handle recording state / update html on recording status
+#Start recording
 @app.route( '/time' )
 def time():
     recordStatus = 'Spelar in...'
@@ -139,6 +143,7 @@ def time():
     recordMic.start()
     return jsonify( { 'recordStatus': recordStatus } )
 
+#Check and handle recording status
 @app.route( '/checkResult' )
 def checkResult():
     if recordInstance.audioRes == 'Analyserar ljud...':
@@ -152,6 +157,7 @@ def checkResult():
         'isListening': recordInstance.isListening 
     })
 
+#Save recording result to txt-file and show in view
 @app.route( '/saveResult' )
 def saveResult():
     recordInstance.setTime()

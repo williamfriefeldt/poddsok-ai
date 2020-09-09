@@ -39,7 +39,7 @@ class Plyssningen:
     def setTime( self ):
         self.file = open( "text-files/" + self.podcast + "_-_" + self.episode + '.txt' , "a+" )
         time = str( self.time[0] ) + str( self.time[1] ) + ':' + str( self.time[2] ) + str( self.time[3] )
-        self.file.write(time + ' - "' + self.audioRes + '"\n')
+        self.file.write( time + ' - "' + self.audioRes + '"\n' )
         self.file.close()
 
     def getAudioRes( self ):
@@ -54,7 +54,7 @@ class Plyssningen:
         self.isListening = True
         self.audioRes = ''
         try:
-            key.press_and_release( 'play/pause media' )
+            key.press_and_release( 'F8' )
         except ValueError:
             self.audioRes = 'Tillåtelse till tangentbord nekat, vänligen tillåt detta.'
             self.isListening = False
@@ -63,15 +63,16 @@ class Plyssningen:
         try:
             with mic as source:
                 r.adjust_for_ambient_noise( source )
-                audio = r.record( source, duration = 20 )
+                audio = r.record( source, duration = 15 )
                 self.result( audio, r )
         except AssertionError as e:
             print( "There was an error in the recording:" )
             print( e )
             print( mic )
 
+    #Handle result when recording is done
     def result( self, audio, r ):
-        key.press_and_release('play/pause media')
+        key.press_and_release('F8')
         self.audioRes = 'Analyserar ljud...'
         try:
             self.audioRes = r.recognize_google(audio, language='sv-SE')

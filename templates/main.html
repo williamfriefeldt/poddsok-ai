@@ -7,7 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <h1> Plyssningen v0.1 </h1>
+    <header>
+      <img src="static/images/title-icon.png" />
+      <h1> Plyssningen v0.1 </h1>
+    </header>
 
     <div class="intro-div">
       <p> {{data.infoText}} </p>
@@ -40,11 +43,11 @@
 
   <script>
     if( $(".episodes").html() === undefined ) {
-      $( 'h1' ).animate({ opacity: 1 }, 2000 );
-      $( '.intro-div' ).animate({ opacity: 1 }, 2000 );
+      $( 'h1' ).animate( { opacity: 1 }, 2000 );
+      $( '.intro-div' ).animate( { opacity: 1 }, 2000 );
     } else {
-      $( 'h1' ).css({ opacity: 1 });
-      $( '.intro-div' ).css({ opacity: 1 });      
+      $( 'h1' ).css( { opacity: 1 } );
+      $( '.intro-div' ).css( { opacity: 1 } );      
     }
   </script>
 </html>

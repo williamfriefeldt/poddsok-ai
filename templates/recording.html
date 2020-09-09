@@ -2,13 +2,16 @@
 <html>
   <head>
     <link rel="shortcut icon" type="image/x-icon" href="static/images/title-icon.png" />
-    <title>Plyssningen</title>
+    <title>Plyssningen v0.1</title>
     {{ moment.include_jquery() }}
     {{ moment.include_moment() }}
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <h1> Plyssningen v0.1 </h1>
+    <header>
+      <img src="static/images/title-icon.png" />
+      <h1> Plyssningen v0.1 </h1>
+    </header>
 
   	<div class="flex">
       <div class="col-left">
@@ -28,26 +31,32 @@
 
   <script>
     $('h1').css( { opacity:1 });
+    var btn = $( '#record-btn' );
 
   	$( '#record-btn' ).click( () => {
-  		var btn = $( '#record-btn' );
-  		if( btn.css('visibility') === 'visible' ) { 
-        timer()
-  			btn.css('visibility', 'hidden');
-  		}
+  		if( btn.html() === 'Spela in' ) { 
+        btn.html( 'Pause' );
+        timer();
+  		} else {
+        btn.html( 'Avslutar...' );
+      }
 	  });
 
 	  var timer = () => {
-  		$.getJSON( '/time', data => {
-        $( '#record-status' ).html( data.recordStatus );
-        checkResult(); 
-      });
+      if( btn.html() === 'Pause' ) {
+    		$.getJSON( '/time', data => {
+          $( '#record-status' ).html( data.recordStatus );
+          checkResult(); 
+        });
+      } else {
+        btn.html( 'Spela in' );
+      }
 	  };
 
     var checkResult = () => {
       $.getJSON( '/checkResult', data => {
         $( '#time' ).html( data.time );
-        if(!data.isListening) {
+        if( !data.isListening ) {
           if( data.recordRes === "Tillåtelse till tangentbord nekat, vänligen tillåt detta." ) {
             $( '#record-status' ).html( data.recordRes );
           } else {
@@ -57,24 +66,25 @@
           $( '#record-btn' ).css('visibility', 'visible');
         } else if( data.recordRes === 'Analyserar ljud...' ) {
           $('#record-status').html( data.recordRes );
-          setTimeout( () => { checkResult() }, 1000 )
+          setTimeout( () => { checkResult() }, 1000 );
         } else {
-          setTimeout( () => { checkResult() }, 1000 )
+          setTimeout( () => { checkResult() }, 1000 );
         }
       });
     };
 
     var saveResult = () => {
       $.getJSON( '/saveResult', data => {
-        var html = ''
+        var html = '';
         for( var i in data ){
           html += '<div class="flex"><div class="col-left">' + data[i] + '</div><div class="col-right">]</div></div>'
         }
         var div = $( '#allResults' );
         div.html( html );
-        div.scrollTop( $( '#allResults' )[0].scrollHeight);
-      })
-    }
+        div.scrollTop( $( '#allResults' )[0].scrollHeight );
+        timer();
+      });
+    };
   	
   </script>
 </html>

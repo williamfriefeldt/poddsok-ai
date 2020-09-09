@@ -33,7 +33,7 @@ select {
 	background-color: white;
 	border: none;
 	border-bottom: 2px solid #320E44; 
-	width: 400px;
+	width: 450px;
 	cursor: pointer;
 	color: #320E44;
 	font-size: 22px;
@@ -41,10 +41,18 @@ select {
 h1 {
 	margin-left: 1.25%;
 	opacity: 0;
+	margin-top: 2.5%;
 }
 form, p {
 	text-align: center;
 	margin-top: 1.5%;
+}
+img {
+	width: 116px;
+	height: 100px;
+}
+header {
+	display: flex;
 }
 .flex {
 	justify-content: space-between;
