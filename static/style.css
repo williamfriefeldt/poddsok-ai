@@ -29,7 +29,7 @@ input:focus, textarea:focus, select:focus{
 select:hover {
 	cursor: pointer
 }
-select {
+input, select {
 	background-color: white;
 	border: none;
 	border-bottom: 2px solid #320E44; 
@@ -43,9 +43,12 @@ h1 {
 	opacity: 0;
 	margin-top: 2.5%;
 }
-form, p {
+form, p, .nr-input {
 	text-align: center;
 	margin-top: 1.5%;
+}
+.nr-input {
+	display: block;
 }
 img {
 	width: 116px;
@@ -53,6 +56,9 @@ img {
 }
 header {
 	display: flex;
+}
+sidebar {
+	padding:2%;
 }
 .flex {
 	justify-content: space-between;
@@ -63,6 +69,7 @@ header {
 }
 .col-right {
 	width: 30%;
+	padding: 2%;
 }
 .intro-div {
 	opacity: 0;

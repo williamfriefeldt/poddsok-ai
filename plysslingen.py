@@ -54,7 +54,7 @@ class Plyssningen:
         self.isListening = True
         self.audioRes = ''
         try:
-            key.press_and_release( 'F8' )
+            key.press_and_release( 'play/pause media' )
         except ValueError:
             self.audioRes = 'Tillåtelse till tangentbord nekat, vänligen tillåt detta.'
             self.isListening = False
@@ -72,7 +72,7 @@ class Plyssningen:
 
     #Handle result when recording is done
     def result( self, audio, r ):
-        key.press_and_release('F8')
+        key.press_and_release('play/pause media')
         self.audioRes = 'Analyserar ljud...'
         try:
             self.audioRes = r.recognize_google(audio, language='sv-SE')

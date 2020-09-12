@@ -14,27 +14,47 @@
 
     <div class="intro-div">
       <p> {{data.infoText}} </p>
-      <form method="post" action="{{ url_for('handle_podcast')}}">
-        <select onchange="this.form.submit()" name="pod">
+      <form method="post" action="{{ url_for( 'handle_podcast' ) }}">
+        <select name="pod" onchange="this.form.submit()">
+          {% if data.nrOfEps == None %}
+            <option value="" disabled selected hidden> Välj en podcast </option>
+          {% endif %}
           {% for item in data.podcasts %}
             <option> {{ item.title }} </option>
-          {% endfor %}
+          {% endfor %}  
         </select>
       </form>
     </div>
-
+    {% if data.nrOfEps != None %}
+      <div class="nr-input">
+        <form method="post" action="{{ url_for( 'handle_nrOfEps' ) }}">
+          {% if data.nrOfEps == 0 %}
+            <input name="nrOfEps" type="number" id="nrOfEps" placeholder="Välj antal avsnitt att spela in" onchange="this.form.submit()" />
+          {% else %}
+            <input name="nrOfEps" type="number" id="nrOfEps" value="{{ data.nrOfEps }}" onchange="this.form.submit()" />
+          {% endif %}
+        </form>
+      </div>  
+    {% endif %}
     {% if data.episodes != None %}
-      <form class="episodes" method="post" action="{{ url_for('handle_episode')}}">
-        <select onchange="this.form.submit()" name="episode">
-            {% for episode in data.episodes %}
-              <option> {{ data.episodes[episode].nr }} . {{ data.episodes[episode].name }} </option>
-            {% endfor %}
-        </select>
-      </form>
+      {% for nr in range(data.nrOfEps) %}
+        <form class="episodes" method="post" action="{{ url_for( 'handle_episode', nrOfEps = data.nrOfEps, epNr = nr ) }}">
+          <select onchange="this.form.submit()" name="episode">
+              {% if data.chosenEps[nr] == None %}
+                <option value="" disabled selected hidden> Välj ett avsnitt </option>
+              {% else %}
+                <option> {{ data.chosenEps[nr] }} </option>
+              {% endif %}
+              {% for episode in data.episodes %}
+                <option> {{ data.episodes[episode].nr }}. {{ data.episodes[episode].name }} </option>
+              {% endfor %}
+          </select>
+        </form>
+      {% endfor %}
     {% endif %}
 
     {% if data.episode %}
-      <form action="{{ url_for('to_recording', episode = data.episode, podcast = data.podcast) }}" method="post">
+      <form action="{{ url_for( 'to_recording', episode = data.episode, podcast = data.podcast ) }}" method="post">
         <span name="episode" value="{{ data.episode }}">
         <button class="continue-button" name="forwardBtn" type="submit"> Till inspelning </button>
       </form>
@@ -42,7 +62,8 @@
   </body>
 
   <script>
-    if( $(".episodes").html() === undefined ) {
+    if( $(".episodes").html() === 'undefined' ) {
+      console.log($(".episodes").html())
       $( 'h1' ).animate( { opacity: 1 }, 2000 );
       $( '.intro-div' ).animate( { opacity: 1 }, 2000 );
     } else {

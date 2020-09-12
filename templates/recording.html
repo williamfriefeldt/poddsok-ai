@@ -8,15 +8,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <header>
-      <img src="static/images/title-icon.png" />
-      <h1> Plyssningen v0.1 </h1>
-    </header>
-
   	<div class="flex">
       <div class="col-left">
+        <header>
+          <img src="static/images/title-icon.png" />
+          <h1> Plyssningen v0.1 </h1>
+        </header>
         <span id="record-status"></span> 
-        <button id="record-btn">Spela in</button>
+        <button id="record-btn"> Spela in </button>
         <div id="allResults"> </div>
       </div>
     	<div class="col-right">
@@ -24,12 +23,15 @@
     		<h3> Podcast: {{ data.podcast.replace("_"," ") }} </h3>
     		<h3> Avsnitt: {{ data.episode.replace("_"," ") }} </h3>
     		<h3> Tid: <span id="time"> 00:00 </span></h3>
-    		<a href="{{ url_for('download', filename=data.podcast+' - '+data.episode) }}" target="_blank"><button>Ladda ner textfil</button></a>
+    		<a href="{{ url_for('download', filename=data.podcast+'_-_'+data.episode) }}" target="_blank">
+          <button> Ladda ner textfil </button>
+        </a>
     	</div>
 		</div>
   </body>
 
   <script>
+    
     $('h1').css( { opacity:1 });
     var btn = $( '#record-btn' );
 
@@ -77,7 +79,7 @@
       $.getJSON( '/saveResult', data => {
         var html = '';
         for( var i in data ){
-          html += '<div class="flex"><div class="col-left">' + data[i] + '</div><div class="col-right">]</div></div>'
+          html += '<div class="flex"><div class="col-1">' + data[i].time + '</div><div class="col-2">' + data[i].text + '</div></div>';
         }
         var div = $( '#allResults' );
         div.html( html );

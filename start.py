@@ -7,7 +7,7 @@ Imports:
 - Plyssningen: Speech recognition class, see plyssningen.py
 - Threading: To start Plyssningen while giving status to html
 '''
-from flask import Flask, render_template, request, send_file, jsonify
+from flask import Flask, render_template, request, send_file, jsonify, redirect
 import pyrebase
 from collections import OrderedDict
 from flask_moment import Moment
@@ -45,6 +45,16 @@ def getPodcasts():
             podcasts.append( { 'title': title, 'episodes': values[key] } )
     return podcasts  
 
+chosenEps = []
+def getEpisodes( nrOfEps, episode, nr ):
+    if nrOfEps != None:
+        for i in range( int( nrOfEps ) ):
+            chosenEps.append( None )
+    else:
+        print(nr)
+        chosenEps[nr] = episode
+    return chosenEps
+
 #Redirect user to main view and fetch podcasts
 @app.route('/')
 def index():
@@ -53,7 +63,8 @@ def index():
     episodes = None
     return render_template('main.html', data = { 
         'podcasts': podcasts, 
-        'episodes': None, 
+        'episodes': None,
+        'nrOfEps': None,
         'infoText': 'Välj den podcast som ska transkriberas' 
     })
 
@@ -69,36 +80,55 @@ def handle_podcast():
             del podcasts[i]
             podcasts.insert( 0, podcast )
         i += 1
-    episodes = list( podcast['episodes'].items() )
+    return render_template( 'main.html', data = { 
+        'podcasts': podcasts, 
+        'episodes': None, 
+        'nrOfEps': 0,
+        'infoText': 'Välj de avsnitt som ska transkriberas' 
+    })
+
+@app.route( '/handle_nrOfEps', methods = ['POST'] )
+def handle_nrOfEps():
+    podcasts = getPodcasts()
+    nrOfEps = request.form['nrOfEps']
+    episodes = list( podcasts[0]['episodes'].items() )
     episodes.sort( key = lambda x: x[1]['nr'] )
     episodes = dict( episodes )
+    chosenEps = getEpisodes( nrOfEps, None, None )
     return render_template( 'main.html', data = { 
         'podcasts': podcasts, 
         'episodes': episodes, 
-        'infoText': 'Välj det avsnitt som ska transkriberas' 
+        'nrOfEps': int( nrOfEps ),
+        'chosenEps': chosenEps,
+        'infoText': 'Välj de avsnitt som ska transkriberas' 
     })
 
 #When episodes choosen => display button for next view
 @app.route( '/handle_episode', methods = ['POST'] )
 def handle_episode():
+    nrOfEps = request.args.get( 'nrOfEps' )
+    nr = int( request.args.get( 'epNr' ) )
+    print(nr)
     podcasts = getPodcasts()
     episodes = podcasts[0]['episodes']
     episode = request.form['episode']
     i = 0
-    episode = episode.split('.')[1]
+    episode = episode.split('.',1)[1]
     listEpisodes = list( episodes.items() )
     for ep in listEpisodes:
-        if ep[1]['name'] == episode:
+        if ep[1]['name'].strip() == episode.strip():
             listEpisodes.remove(ep)
             listEpisodes.sort( key = lambda x: x[1]['nr'] )
             listEpisodes.insert(0, ep)
             break
-
     episodes = dict(listEpisodes)
+    chosenEps = getEpisodes( None, episode, nr )
     return render_template( 'main.html', data = { 
         'podcasts': podcasts, 
         'podcast': podcasts[0]['title'], 
-        'episodes': episodes, 'episode': episode, 
+        'episodes': episodes, 
+        'chosenEps': chosenEps, 
+        'nrOfEps': int( nrOfEps ),
         'infoText': 'Öppna avsnittet i Spotify och fortsätt till inspelning' 
     })
 
@@ -116,7 +146,7 @@ def to_recording():
 #Save file to computer
 @app.route( '/download/<path:filename>.txt' )
 def download( filename ):
-    return send_file( 'test_res.txt', attachment_filename = '' )
+    return send_file( 'text-files/' + filename + '.txt', attachment_filename = '' )
 
 #Update current recording time
 def getTime(): 
@@ -129,7 +159,7 @@ def getTime():
     if timeCount[2] == 6:
         timeCount[1] += 1
         timeCount[2] = 0
-    if timeCount[1] == 6:
+    if timeCount[1] == 10:
         timeCount[0] += 1
         timeCount[1] = 0
     recordInstance.time = timeCount
@@ -162,8 +192,12 @@ def checkResult():
 def saveResult():
     recordInstance.setTime()
     timeString = str( recordInstance.time[0] ) + str( recordInstance.time[1] ) + ':' + str( recordInstance.time[2] ) + str( recordInstance.time[3] )
-    resultList.append( '[ ' + timeString + ', "' + recordInstance.audioRes + '"' )
+    resultList.append( { 'time': timeString, 'text': '"' + recordInstance.audioRes + '"' } )
     return jsonify( resultList )
 
+@app.route('/openSpotify')
+def openSpotify():
+    print('spotify:episode:1kEr0FqisHG4T6inFzC2iM')
+    return jsonify({"redirect": 'spotify:episode:0UPKQhbGXM5Iih9zDhVU9p'})
       
 
