@@ -74,6 +74,11 @@ sidebar {
 .intro-div {
 	opacity: 0;
 }
+.current-ep {
+	border: 2px solid #320E44;
+	margin: 1%;
+	padding: 2%;
+}
 #record-status {
 	display: block;
 	margin-left: 1%;

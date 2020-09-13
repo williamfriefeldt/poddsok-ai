@@ -48,18 +48,21 @@ def getPodcasts():
 chosenEps = []
 def getEpisodes( nrOfEps, episode, nr ):
     if nrOfEps != None:
+        chosenEps.clear()
         for i in range( int( nrOfEps ) ):
             chosenEps.append( None )
     else:
-        print(nr)
         chosenEps[nr] = episode
+    return chosenEps
+
+def chosenEpsSet():
     return chosenEps
 
 #Redirect user to main view and fetch podcasts
 @app.route('/')
 def index():
     podcasts = getPodcasts()
-    podcasts.sort( key = lambda x: x['title'])
+    podcasts.sort( key = lambda x: x['title'] )
     episodes = None
     return render_template('main.html', data = { 
         'podcasts': podcasts, 
@@ -95,11 +98,18 @@ def handle_nrOfEps():
     episodes.sort( key = lambda x: x[1]['nr'] )
     episodes = dict( episodes )
     chosenEps = getEpisodes( nrOfEps, None, None )
+    nrOfChosenEps = 0
+    for ep in chosenEps:
+        if ep != None:
+            nrOfChosenEps += 1
+    chosenEpsLength = len(chosenEps)
     return render_template( 'main.html', data = { 
         'podcasts': podcasts, 
-        'episodes': episodes, 
+        'episodes': episodes,
         'nrOfEps': int( nrOfEps ),
+        'nrOfChosenEps': int( nrOfChosenEps ),
         'chosenEps': chosenEps,
+        'chosenEpsLength': int( chosenEpsLength ),
         'infoText': 'Välj de avsnitt som ska transkriberas' 
     })
 
@@ -108,27 +118,32 @@ def handle_nrOfEps():
 def handle_episode():
     nrOfEps = request.args.get( 'nrOfEps' )
     nr = int( request.args.get( 'epNr' ) )
-    print(nr)
     podcasts = getPodcasts()
     episodes = podcasts[0]['episodes']
-    episode = request.form['episode']
+    episodeNr = int( request.form['episode'].split( '.' )[0] )
     i = 0
-    episode = episode.split('.',1)[1]
     listEpisodes = list( episodes.items() )
     for ep in listEpisodes:
-        if ep[1]['name'].strip() == episode.strip():
+        if ep[1]['nr'] == episodeNr:
             listEpisodes.remove(ep)
             listEpisodes.sort( key = lambda x: x[1]['nr'] )
             listEpisodes.insert(0, ep)
+            chosenEps = getEpisodes( None, ep[1], nr )
             break
     episodes = dict(listEpisodes)
-    chosenEps = getEpisodes( None, episode, nr )
+    nrOfChosenEps = 0
+    for ep in chosenEps:
+        if ep != None:
+            nrOfChosenEps += 1
+    chosenEpsLength = len(chosenEps)
     return render_template( 'main.html', data = { 
         'podcasts': podcasts, 
         'podcast': podcasts[0]['title'], 
         'episodes': episodes, 
         'chosenEps': chosenEps, 
         'nrOfEps': int( nrOfEps ),
+        'nrOfChosenEps': int( nrOfChosenEps ),
+        'chosenEpsLength': int( chosenEpsLength ),
         'infoText': 'Öppna avsnittet i Spotify och fortsätt till inspelning' 
     })
 
@@ -137,11 +152,11 @@ resultList = []
 @app.route( '/to_recording', methods = ['POST'] )
 def to_recording():
     resultList = []
-    episode = request.args.get( 'episode' ).replace( ' ', '_' )
     podcast = request.args.get( 'podcast' ).replace( ' ', '_' )
+    episode = chosenEpsSet()[0]
     recordInstance.setAttr( podcast, episode )
     recordInstance.writeInfo()
-    return render_template( 'recording.html', data = { 'podcast': podcast, 'episode': episode })
+    return render_template( 'recording.html', data = { 'podcast': podcast, 'episode': episode, 'chosenEps': chosenEpsSet() } )
 
 #Save file to computer
 @app.route( '/download/<path:filename>.txt' )
@@ -168,6 +183,7 @@ def getTime():
 #Start recording
 @app.route( '/time' )
 def time():
+    print('spelar in')
     recordStatus = 'Spelar in...'
     recordMic = threading.Thread( target = recordInstance.startMicrophone, args = () )
     recordMic.start()

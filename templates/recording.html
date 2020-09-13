@@ -15,17 +15,27 @@
           <h1> Plyssningen v0.1 </h1>
         </header>
         <span id="record-status"></span> 
-        <button id="record-btn"> Spela in </button>
+        <button id="record-btn">Spela in</button>
         <div id="allResults"> </div>
       </div>
     	<div class="col-right">
     		{{ moment().format('MMMM Do YYYY, h:mm:ss a') }}
-    		<h3> Podcast: {{ data.podcast.replace("_"," ") }} </h3>
-    		<h3> Avsnitt: {{ data.episode.replace("_"," ") }} </h3>
-    		<h3> Tid: <span id="time"> 00:00 </span></h3>
-    		<a href="{{ url_for('download', filename=data.podcast+'_-_'+data.episode) }}" target="_blank">
-          <button> Ladda ner textfil </button>
-        </a>
+        <h3> Podcast: {{ data.podcast.replace("_"," ") }} </h3>
+        {% for ep in data.chosenEps %}
+          {% if data.chosenEps.index(ep) == 0 %}
+            <div class="current-ep">
+          {% endif %}
+          		<h3> Avsnitt: {{ ep.name.replace("_"," ") }} </h3>
+          		<h3> Tid: <span id="time"> 00:00 </span></h3>
+          		<a href="{{ url_for('download', filename=data.podcast+'_-_'+data.episode['name']) }}" target="_blank">
+                {% if data.chosenEps.index(ep) == 0 %}
+                  <button> Ladda ner textfil </button>
+                {% endif %}
+              </a>
+          {% if data.chosenEps.index(ep) == 0 %}
+            </div>
+          {% endif %}
+        {% endfor %}
     	</div>
 		</div>
   </body>

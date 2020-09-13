@@ -43,7 +43,7 @@
               {% if data.chosenEps[nr] == None %}
                 <option value="" disabled selected hidden> Välj ett avsnitt </option>
               {% else %}
-                <option> {{ data.chosenEps[nr] }} </option>
+                <option> {{ data.chosenEps[nr].nr }}. {{ data.chosenEps[nr].name }} </option>
               {% endif %}
               {% for episode in data.episodes %}
                 <option> {{ data.episodes[episode].nr }}. {{ data.episodes[episode].name }} </option>
@@ -51,14 +51,14 @@
           </select>
         </form>
       {% endfor %}
+      {% if data.nrOfChosenEps == data.chosenEpsLength %}
+          <form action="{{ url_for( 'to_recording', podcast = data.podcast ) }}" method="post">
+            <button class="continue-button" name="forwardBtn" type="submit"> Till inspelning </button>
+          </form>
+      {% endif %}
     {% endif %}
 
-    {% if data.episode %}
-      <form action="{{ url_for( 'to_recording', episode = data.episode, podcast = data.podcast ) }}" method="post">
-        <span name="episode" value="{{ data.episode }}">
-        <button class="continue-button" name="forwardBtn" type="submit"> Till inspelning </button>
-      </form>
-    {% endif %}
+
   </body>
 
   <script>
