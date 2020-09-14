@@ -64,6 +64,9 @@ sidebar {
 	justify-content: space-between;
 	display: flex;
 }
+.inline {
+	display: inline;
+}
 .col-left {
 	width: 70%;
 }
@@ -76,8 +79,20 @@ sidebar {
 }
 .current-ep {
 	border: 2px solid #320E44;
+	border-radius: 25px;
 	margin: 1%;
 	padding: 2%;
+}
+.time-btn {
+	float: right;
+	width: 115px;
+}
+.time-btn:hover {
+	width: 120px;
+	font-size: 15px;
+}
+.time-inp {
+	width: 50px;
 }
 #record-status {
 	display: block;

@@ -183,7 +183,6 @@ def getTime():
 #Start recording
 @app.route( '/time' )
 def time():
-    print('spelar in')
     recordStatus = 'Spelar in...'
     recordMic = threading.Thread( target = recordInstance.startMicrophone, args = () )
     recordMic.start()

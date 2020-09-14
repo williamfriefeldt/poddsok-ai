@@ -26,12 +26,21 @@
             <div class="current-ep">
           {% endif %}
           		<h3> Avsnitt: {{ ep.name.replace("_"," ") }} </h3>
-          		<h3> Tid: <span id="time"> 00:00 </span></h3>
+          		<h3 class="inline"> Tid: 
+                <span id="time"> 
+                  00:00 
+                </span>
+                <span id="change-time" hidden>
+                  <input class="time-inp" id="min" type="number" /> :
+                  <input class="time-inp" id="sec" type="number" />
+                </span>
+              </h3>
+              {% if data.chosenEps.index(ep) == 0 %}
+              <button class="time-btn inline">Ändra tid</button> 
           		<a href="{{ url_for('download', filename=data.podcast+'_-_'+data.episode['name']) }}" target="_blank">
-                {% if data.chosenEps.index(ep) == 0 %}
                   <button> Ladda ner textfil </button>
-                {% endif %}
               </a>
+              {% endif %}
           {% if data.chosenEps.index(ep) == 0 %}
             </div>
           {% endif %}
@@ -97,6 +106,29 @@
         timer();
       });
     };
+
+    $('.time-btn').click( () => {
+      var timeBtn = $( '.time-btn' );
+      var timeTxt = $('#time');
+      if( timeBtn.html() === 'Ändra tid' ) {
+        timeBtn.html( 'Spara tid' );
+        timeTxt.hide();
+        var min = parseInt( timeTxt.html().split(':')[0] );
+        var sec = parseInt( timeTxt.html().split(':')[1] );
+        $( '#min' ).val( min );
+        $( '#sec' ).val( sec );
+        $('#change-time').show();
+      } else {
+        timeBtn.html( 'Ändra tid' )
+        var min = $( '#min' ).val();
+        var sec = $( '#sec' ).val();
+        if( parseInt( min ) < 10 ) min = "0" + min;
+        if( parseInt( sec ) < 10 ) sec = "0" + sec;
+        timeTxt.html( min + ':' + sec );
+        timeTxt .show()
+        $('#change-time').hide()
+      }
+    });
   	
   </script>
 </html>
