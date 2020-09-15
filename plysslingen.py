@@ -32,13 +32,15 @@ class Plyssningen:
 
     #Save podcast and episode titles to text file
     def writeInfo( self ):
-        self.file = open( "text-files/" + self.podcast + "_-_" + self.episode['name'].strip('"').replace(' ', '_') + '.txt' , "w+" )
-        self.file.write( "Podcast: " + self.podcast + "\n" + "Episode: " + self.episode['name'].strip('"').replace(' ', '_') + "\n=======================\n" )
+        epNr = str( self.episode['nr'] )
+        self.file = open( "text-files/" + self.podcast + "_-_avsnitt_" + epNr + ".txt" , "w+" )
+        self.file.write( "Podcast: " + self.podcast + "\n" + "Avsnitt: " + epNr + "\n=======================\n" )
         self.file.close()
 
     #Save audio result and current time to text file
     def setTime( self ):
-        self.file = open( "text-files/" + self.podcast + "_-_" + self.episode['name'].strip('"').replace(' ', '_') + '.txt' , "a+" )
+        epNr = str( self.episode['nr'] )
+        self.file = open( "text-files/" + self.podcast + "_-_avsnitt_" + epNr + ".txt" , "a+" )
         time = str( self.time[0] ) + str( self.time[1] ) + ':' + str( self.time[2] ) + str( self.time[3] )
         self.file.write( time + ' - "' + self.audioRes + '"\n' )
         self.file.close()

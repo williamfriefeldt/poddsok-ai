@@ -73,6 +73,7 @@ sidebar {
 .col-right {
 	width: 30%;
 	padding: 2%;
+	border-left: 2px solid #320E44;
 }
 .intro-div {
 	opacity: 0;
@@ -94,12 +95,16 @@ sidebar {
 .time-inp {
 	width: 50px;
 }
+.col-2 {
+	padding-left: 3%;
+	padding-right: 2%;
+}
 #record-status {
 	display: block;
 	margin-left: 1%;
 }
 #allResults {
-	height: 80vh;
+	height: 70vh;
 	overflow-y: scroll;
 }
 #allResults::-webkit-scrollbar {

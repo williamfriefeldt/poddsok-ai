@@ -154,8 +154,6 @@ def to_recording():
     resultList = []
     podcast = request.args.get( 'podcast' ).replace( ' ', '_' )
     currentEp = int( request.args.get( 'currentEp' ) )
-    print(podcast)
-    print(currentEp)
     try:
         episode = chosenEpsSet()[ currentEp ]
     except IndexError:
@@ -164,12 +162,13 @@ def to_recording():
         'episodes': None,
         'nrOfEps': None,
         'infoText': 'Välj den podcast som ska transkriberas' 
-    })
+        })
     recordInstance.setAttr( podcast, episode )
     recordInstance.writeInfo()
     return render_template( 'recording.html', data = { 
         'podcast': podcast, 
         'episode': episode, 
+        'currentEp': currentEp,
         'chosenEps': chosenEpsSet() 
     })
 
