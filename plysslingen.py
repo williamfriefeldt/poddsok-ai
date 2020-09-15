@@ -38,7 +38,6 @@ class Plyssningen:
 
     #Save audio result and current time to text file
     def setTime( self ):
-        print(self.episode)
         self.file = open( "text-files/" + self.podcast + "_-_" + self.episode['name'].strip('"').replace(' ', '_') + '.txt' , "a+" )
         time = str( self.time[0] ) + str( self.time[1] ) + ':' + str( self.time[2] ) + str( self.time[3] )
         self.file.write( time + ' - "' + self.audioRes + '"\n' )

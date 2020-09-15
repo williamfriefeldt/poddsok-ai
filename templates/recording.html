@@ -20,7 +20,7 @@
       </div>
     	<div class="col-right">
     		{{ moment().format('MMMM Do YYYY, h:mm:ss a') }}
-        <h3> Podcast: {{ data.podcast.replace("_"," ") }} </h3>
+        <h3> Podcast: <span id="pod"> {{ data.podcast.replace("_"," ") }} </span> </h3>
         {% for ep in data.chosenEps %}
           {% if data.chosenEps.index(ep) == 0 %}
             <div class="current-ep">
@@ -37,7 +37,7 @@
               </h3>
               {% if data.chosenEps.index(ep) == 0 %}
               <button class="time-btn inline">Ändra tid</button> 
-          		<a href="{{ url_for('download', filename=data.podcast+'_-_'+data.episode['name']) }}" target="_blank">
+          		<a href="{{ url_for('download', filename = data.podcast+'_-_'+data.episode['name']) }}" target="_blank">
                   <button> Ladda ner textfil </button>
               </a>
               {% endif %}
@@ -58,16 +58,22 @@
   		if( btn.html() === 'Spela in' ) { 
         btn.html( 'Pause' );
         timer();
-  		} else {
+      } else {
         btn.html( 'Avslutar...' );
       }
 	  });
 
 	  var timer = () => {
       if( btn.html() === 'Pause' ) {
-    		$.getJSON( '/time', data => {
+        var currTime = $( '#time' ).html();
+    		$.getJSON( '/time', { time: currTime }, data => {
           $( '#record-status' ).html( data.recordStatus );
-          checkResult(); 
+          if( data.recordStatus !== 'Avsnittet färdig avlyssnat!' ) {
+            checkResult();
+          } else {
+            btn.hide();
+            $( '#next-ep' ).show();
+          }
         });
       } else {
         btn.html( 'Spela in' );

@@ -153,10 +153,25 @@ resultList = []
 def to_recording():
     resultList = []
     podcast = request.args.get( 'podcast' ).replace( ' ', '_' )
-    episode = chosenEpsSet()[0]
+    currentEp = int( request.args.get( 'currentEp' ) )
+    print(podcast)
+    print(currentEp)
+    try:
+        episode = chosenEpsSet()[ currentEp ]
+    except IndexError:
+        return render_template( 'main.html', data = { 
+        'podcasts': getPodcasts(), 
+        'episodes': None,
+        'nrOfEps': None,
+        'infoText': 'Välj den podcast som ska transkriberas' 
+    })
     recordInstance.setAttr( podcast, episode )
     recordInstance.writeInfo()
-    return render_template( 'recording.html', data = { 'podcast': podcast, 'episode': episode, 'chosenEps': chosenEpsSet() } )
+    return render_template( 'recording.html', data = { 
+        'podcast': podcast, 
+        'episode': episode, 
+        'chosenEps': chosenEpsSet() 
+    })
 
 #Save file to computer
 @app.route( '/download/<path:filename>.txt' )
@@ -183,10 +198,20 @@ def getTime():
 #Start recording
 @app.route( '/time' )
 def time():
-    recordStatus = 'Spelar in...'
-    recordMic = threading.Thread( target = recordInstance.startMicrophone, args = () )
-    recordMic.start()
-    return jsonify( { 'recordStatus': recordStatus } )
+    timeList = request.args.get( 'time' ).split( ':' );
+    minutes = "".join(timeList[0].split(' ')).strip('\n')
+    minutesInt = int(minutes[0])*10 + int(minutes[1])
+    if int( recordInstance.episode['length'] ) >= minutesInt:
+        seconds = "".join(timeList[1].split(' '))
+        timeList[0::1] = [ int(minutes[0]), int(minutes[1]) ]
+        timeList[2::1] = [ int(seconds[0]), int(seconds[1]) ]
+        recordInstance.time = timeList
+        recordStatus = 'Spelar in...'
+        recordMic = threading.Thread( target = recordInstance.startMicrophone, args = () )
+        recordMic.start()
+        return jsonify( { 'recordStatus': recordStatus } )
+    else:
+        return jsonify( { 'recordStatus': 'Avsnittet färdig avlyssnat!' })
 
 #Check and handle recording status
 @app.route( '/checkResult' )
